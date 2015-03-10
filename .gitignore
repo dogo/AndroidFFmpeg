@@ -34,6 +34,4 @@ libs/**
 proguard/**
 .settings/**
 lint.xml
-jni/.settings/**
-jni/ffmpeg-build/**
-jni/libyuv/**
+external/ffmpeg-build/**
