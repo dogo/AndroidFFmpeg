@@ -1,19 +1,7 @@
 #!/bin/bash
 #
 # build_android.sh
-# Copyright (c) 2012 Jacek Marchwicki
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (c) 2015 Diogo Autilio
 
 if [ "$NDK" = "" ]; then
 	echo NDK variable not set, exiting
@@ -40,7 +28,8 @@ function build_x264
 	export AR="${CROSS_COMPILE}ar"
 	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -nostdlib -lc -lm -ldl -llog"
 
-	cd x264
+	pushd external/x264
+
 	./configure \
         --prefix=$(pwd)/$PREFIX \
         --host=$HOST-linux \
@@ -50,7 +39,7 @@ function build_x264
 
 	make clean || exit 1
 	make -j4 install || exit 1
-	cd ..
+	popd
 }
 
 function build_freetype2
@@ -71,6 +60,7 @@ function build_freetype2
 	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib  -nostdlib -lc -lm -ldl -llog"
 
     pushd external/freetype2
+
 	export PKG_CONFIG_LIBDIR=$(pwd)/$PREFIX/lib/pkgconfig/
 	export PKG_CONFIG_PATH=$(pwd)/$PREFIX/lib/pkgconfig/
 	./configure \
@@ -85,7 +75,7 @@ function build_freetype2
 
 	make clean || exit 1
 	make -j4 install || exit 1
-	cd ..
+	popd
 }
 
 function build_ffmpeg
@@ -102,10 +92,14 @@ pkg-config \$*
 EOF
 		chmod u+x $PKG_CONFIG
 	fi
-	NM=$PREBUILT/bin/$EABIARCH-nm
-	cd ffmpeg
+
+    NM=$PREBUILT/bin/$EABIARCH-nm
+
+	pushd external/ffmpeg
+
 	export PKG_CONFIG_LIBDIR=$(pwd)/$PREFIX/lib/pkgconfig/
 	export PKG_CONFIG_PATH=$(pwd)/$PREFIX/lib/pkgconfig/
+
 	./configure --target-os=linux \
 	    --prefix=$PREFIX \
 	    --enable-cross-compile \
@@ -122,9 +116,9 @@ EOF
 	    --extra-ldflags="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib  -nostdlib -lc -lm -ldl -llog -L$PREFIX/lib" \
 	    --extra-cflags="-I$PREFIX/include" \
 	    --disable-everything \
-	    --enable-libass \
-	    --enable-libvo-aacenc \
-	    --enable-libvo-amrwbenc \
+	    --disable-libass \
+	    --disable-libvo-aacenc \
+	    --disable-libvo-amrwbenc \
 	    --enable-hwaccel=h264_vaapi \
 	    --enable-hwaccel=h264_vaapi \
 	    --enable-hwaccel=h264_dxva2 \
@@ -202,14 +196,14 @@ EOF
 	make clean || exit 1
 	make -j4 install || exit 1
 
-	cd ..
+	popd
 }
 
 function build_one {
-	cd ffmpeg
+	pushd external/ffmpeg
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
 	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib  -soname $SONAME -shared -nostdlib -z noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lfreetype -lswscale -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.9/libgcc.a || exit 1
-	cd ..
+	popd
 }
 
 #arm v5
@@ -224,7 +218,7 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_freetype2
+#build_freetype2
 build_ffmpeg
 build_one
 
@@ -239,7 +233,8 @@ ADDITIONAL_CONFIGURE_FLAG=--disable-asm
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/x86-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_freetype2
+build_x264
+#build_freetype2
 build_ffmpeg
 build_one
 
@@ -254,7 +249,8 @@ ADDITIONAL_CONFIGURE_FLAG="--disable-mips32r2"
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/mipsel-linux-android-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_freetype2
+build_x264
+#build_freetype2
 build_ffmpeg
 build_one
 
@@ -270,7 +266,8 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_freetype2
+build_x264
+#build_freetype2
 build_ffmpeg
 build_one
 
@@ -286,7 +283,8 @@ ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 SONAME=libffmpeg-neon.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_freetype2
+build_x264
+#build_freetype2
 build_ffmpeg
 build_one
 
@@ -301,6 +299,7 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-21
-build_freetype2
+build_x264
+#build_freetype2
 build_ffmpeg
 build_one
