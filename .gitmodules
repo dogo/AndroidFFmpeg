@@ -1,0 +1,9 @@
+[submodule "external/ffmpeg"]
+	path = external/ffmpeg
+	url = git://source.ffmpeg.org/ffmpeg.git
+[submodule "external/x264"]
+	path = external/x264
+	url = git://git.videolan.org/x264.git
+[submodule "external/freetype2"]
+	path = external/freetype2
+	url = git://git.sv.gnu.org/freetype/freetype2.git

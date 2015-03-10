@@ -24,3 +24,16 @@ proguard/
 
 # Log Files
 *.log
+
+# Project files
+bin/**
+gen/**
+tmp/**
+obj/**
+libs/**
+proguard/**
+.settings/**
+lint.xml
+jni/.settings/**
+jni/ffmpeg-build/**
+jni/libyuv/**
