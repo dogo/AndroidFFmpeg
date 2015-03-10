@@ -28,7 +28,6 @@ function build_x264
 	export PATH=${PATH}:$PREBUILT/bin/
 	CROSS_COMPILE=$PREBUILT/bin/$EABIARCH-
 	CFLAGS=$OPTIMIZE_CFLAGS
-#CFLAGS=" -I$ARM_INC -fpic -DANDROID -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID  -Wa,--noexecstack -MMD -MP "
 	export CPPFLAGS="$CFLAGS"
 	export CFLAGS="$CFLAGS"
 	export CXXFLAGS="$CFLAGS"
@@ -54,82 +53,12 @@ function build_x264
 	cd ..
 }
 
-function build_amr
-{
-	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	export PATH=${PATH}:$PREBUILT/bin/
-	CROSS_COMPILE=$PREBUILT/bin/$EABIARCH-
-	CFLAGS=$OPTIMIZE_CFLAGS
-#CFLAGS=" -I$ARM_INC -fpic -DANDROID -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID  -Wa,--noexecstack -MMD -MP "
-	export CPPFLAGS="$CFLAGS"
-	export CFLAGS="$CFLAGS"
-	export CXXFLAGS="$CFLAGS"
-	export CXX="${CROSS_COMPILE}g++ --sysroot=$PLATFORM"
-	export CC="${CROSS_COMPILE}gcc --sysroot=$PLATFORM"
-	export NM="${CROSS_COMPILE}nm"
-	export STRIP="${CROSS_COMPILE}strip"
-	export RANLIB="${CROSS_COMPILE}ranlib"
-	export AR="${CROSS_COMPILE}ar"
-	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -nostdlib -lc -lm -ldl -llog"
-
-	cd vo-amrwbenc
-	./configure \
-	    --prefix=$(pwd)/$PREFIX \
-	    --host=$HOST-linux \
-	    --disable-dependency-tracking \
-	    --disable-shared \
-	    --enable-static \
-	    --with-pic \
-	    $ADDITIONAL_CONFIGURE_FLAG \
-	    || exit 1
-
-	make clean || exit 1
-	make -j4 install || exit 1
-	cd ..
-}
-
-function build_aac
-{
-	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	export PATH=${PATH}:$PREBUILT/bin/
-	CROSS_COMPILE=$PREBUILT/bin/$EABIARCH-
-	CFLAGS=$OPTIMIZE_CFLAGS
-#CFLAGS=" -I$ARM_INC -fpic -DANDROID -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID  -Wa,--noexecstack -MMD -MP "
-	export CPPFLAGS="$CFLAGS"
-	export CFLAGS="$CFLAGS"
-	export CXXFLAGS="$CFLAGS"
-	export CXX="${CROSS_COMPILE}g++ --sysroot=$PLATFORM"
-	export CC="${CROSS_COMPILE}gcc --sysroot=$PLATFORM"
-	export NM="${CROSS_COMPILE}nm"
-	export STRIP="${CROSS_COMPILE}strip"
-	export RANLIB="${CROSS_COMPILE}ranlib"
-	export AR="${CROSS_COMPILE}ar"
-	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -nostdlib -lc -lm -ldl -llog"
-
-	cd vo-aacenc
-	export PKG_CONFIG_LIBDIR=$(pwd)/$PREFIX/lib/pkgconfig/
-	export PKG_CONFIG_PATH=$(pwd)/$PREFIX/lib/pkgconfig/
-	./configure \
-	    --prefix=$(pwd)/$PREFIX \
-	    --host=$HOST-linux \
-	    --disable-dependency-tracking \
-	    --disable-shared \
-	    --enable-static \
-	    --with-pic \
-	    $ADDITIONAL_CONFIGURE_FLAG \
-	    || exit 1
-
-	make clean || exit 1
-	make -j4 install || exit 1
-	cd ..
-}
 function build_freetype2
 {
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
 	export PATH=${PATH}:$PREBUILT/bin/
 	CROSS_COMPILE=$PREBUILT/bin/$EABIARCH-
 	CFLAGS=$OPTIMIZE_CFLAGS
-#CFLAGS=" -I$ARM_INC -fpic -DANDROID -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID  -Wa,--noexecstack -MMD -MP "
 	export CPPFLAGS="$CFLAGS"
 	export CFLAGS="$CFLAGS"
 	export CXXFLAGS="$CFLAGS"
@@ -141,7 +70,7 @@ function build_freetype2
 	export AR="${CROSS_COMPILE}ar"
 	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib  -nostdlib -lc -lm -ldl -llog"
 
-	cd freetype2
+    pushd external/freetype2
 	export PKG_CONFIG_LIBDIR=$(pwd)/$PREFIX/lib/pkgconfig/
 	export PKG_CONFIG_PATH=$(pwd)/$PREFIX/lib/pkgconfig/
 	./configure \
@@ -158,76 +87,7 @@ function build_freetype2
 	make -j4 install || exit 1
 	cd ..
 }
-function build_ass
-{
-	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	export PATH=${PATH}:$PREBUILT/bin/
-	CROSS_COMPILE=$PREBUILT/bin/$EABIARCH-
-	CFLAGS="$OPTIMIZE_CFLAGS"
-#CFLAGS=" -I$ARM_INC -fpic -DANDROID -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID  -Wa,--noexecstack -MMD -MP "
-	export CPPFLAGS="$CFLAGS"
-	export CFLAGS="$CFLAGS"
-	export CXXFLAGS="$CFLAGS"
-	export CXX="${CROSS_COMPILE}g++ --sysroot=$PLATFORM"
-	export CC="${CROSS_COMPILE}gcc --sysroot=$PLATFORM"
-	export NM="${CROSS_COMPILE}nm"
-	export STRIP="${CROSS_COMPILE}strip"
-	export RANLIB="${CROSS_COMPILE}ranlib"
-	export AR="${CROSS_COMPILE}ar"
-	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib  -nostdlib -lc -lm -ldl -llog"
 
-	cd libass
-	export PKG_CONFIG_LIBDIR=$(pwd)/$PREFIX/lib/pkgconfig/
-	export PKG_CONFIG_PATH=$(pwd)/$PREFIX/lib/pkgconfig/
-	./configure \
-	    --prefix=$(pwd)/$PREFIX \
-	    --host=$HOST-linux \
-	    --disable-fontconfig \
-	    --disable-dependency-tracking \
-	    --disable-shared \
-	    --enable-static \
-	    --with-pic \
-	    $ADDITIONAL_CONFIGURE_FLAG \
-	    || exit 1
-
-	make clean || exit 1
-	make V=1 -j4 install || exit 1
-	cd ..
-}
-function build_fribidi
-{
-	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	export PATH=${PATH}:$PREBUILT/bin/
-	CROSS_COMPILE=$PREBUILT/bin/$EABIARCH-
-	CFLAGS="$OPTIMIZE_CFLAGS -std=gnu99"
-#CFLAGS=" -I$ARM_INC -fpic -DANDROID -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID  -Wa,--noexecstack -MMD -MP "
-	export CPPFLAGS="$CFLAGS"
-	export CFLAGS="$CFLAGS"
-	export CXXFLAGS="$CFLAGS"
-	export CXX="${CROSS_COMPILE}g++ --sysroot=$PLATFORM"
-	export CC="${CROSS_COMPILE}gcc --sysroot=$PLATFORM"
-	export NM="${CROSS_COMPILE}nm"
-	export STRIP="${CROSS_COMPILE}strip"
-	export RANLIB="${CROSS_COMPILE}ranlib"
-	export AR="${CROSS_COMPILE}ar"
-	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -nostdlib -lc -lm -ldl -llog"
-
-	cd fribidi
-	./configure \
-	    --prefix=$(pwd)/$PREFIX \
-	    --host=$HOST-linux \
-	    --disable-bin \
-	    --disable-dependency-tracking \
-	    --disable-shared \
-	    --enable-static \
-	    --with-pic \
-	    $ADDITIONAL_CONFIGURE_FLAG \
-	    || exit 1
-
-	make clean || exit 1
-	make -j4 install || exit 1
-	cd ..
-}
 function build_ffmpeg
 {
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
@@ -348,7 +208,7 @@ EOF
 function build_one {
 	cd ffmpeg
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib  -soname $SONAME -shared -nostdlib -z noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lass -lfreetype -lfribidi -lswscale -lvo-aacenc -lvo-amrwbenc -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.9/libgcc.a || exit 1
+	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib  -soname $SONAME -shared -nostdlib -z noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lfreetype -lswscale -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.9/libgcc.a || exit 1
 	cd ..
 }
 
@@ -364,11 +224,7 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_amr
-build_aac
-build_fribidi
 build_freetype2
-build_ass
 build_ffmpeg
 build_one
 
@@ -383,11 +239,7 @@ ADDITIONAL_CONFIGURE_FLAG=--disable-asm
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/x86-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_amr
-build_aac
-build_fribidi
 build_freetype2
-build_ass
 build_ffmpeg
 build_one
 
@@ -402,11 +254,7 @@ ADDITIONAL_CONFIGURE_FLAG="--disable-mips32r2"
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/mipsel-linux-android-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_amr
-build_aac
-build_fribidi
 build_freetype2
-build_ass
 build_ffmpeg
 build_one
 
@@ -422,11 +270,7 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_amr
-build_aac
-build_fribidi
 build_freetype2
-build_ass
 build_ffmpeg
 build_one
 
@@ -442,11 +286,7 @@ ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 SONAME=libffmpeg-neon.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
-build_amr
-build_aac
-build_fribidi
 build_freetype2
-build_ass
 build_ffmpeg
 build_one
 
@@ -455,17 +295,12 @@ EABIARCH=aarch64-linux-android
 HOST=aarch64
 ARCH=arm64
 CPU=arm64
-#OPTIMIZE_CFLAGS="-mfloat-abi=softfp -mfpu=neon -marm -march=$CPU -mtune=cortex-a8 -mthumb -D__thumb__ "
 PREFIX=../ffmpeg-build/arm64-v8a
 OUT_LIBRARY=../ffmpeg-build/arm64-v8a/libffmpeg.so
 ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-21
-build_amr
-build_aac
-build_fribidi
 build_freetype2
-build_ass
 build_ffmpeg
 build_one
