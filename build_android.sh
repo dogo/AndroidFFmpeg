@@ -242,10 +242,10 @@ build_one
 EABIARCH=mipsel-linux-android
 HOST=mips
 ARCH=mips
-OPTIMIZE_CFLAGS="-EL -march=mips32 -mips32 -mhard-float"
+OPTIMIZE_CFLAGS=
 PREFIX=../ffmpeg-build/mips
 OUT_LIBRARY=$PREFIX/libffmpeg.so
-ADDITIONAL_CONFIGURE_FLAG="--disable-mips32r2"
+ADDITIONAL_CONFIGURE_FLAG="--disable-mipsfpu --disable-asm"
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/mipsel-linux-android-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
