@@ -279,7 +279,7 @@ ARCH=arm
 CPU=armv7-a
 OPTIMIZE_CFLAGS="-mfloat-abi=softfp -mfpu=neon -marm -march=$CPU -mtune=cortex-a8 -mthumb -D__thumb__ "
 PREFIX=../ffmpeg-build/armeabi-v7a-neon
-OUT_LIBRARY=../ffmpeg-build/armeabi-v7a/libffmpeg-neon.so
+OUT_LIBRARY=../ffmpeg-build/armeabi-v7a-neon/libffmpeg-neon.so
 ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 SONAME=libffmpeg-neon.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
