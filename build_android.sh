@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 # build_android.sh
-# Copyright (c) 2015 Diogo Autilio
+# Created by Diogo Autilio on 10/20/14.
+# Copyright (c) 2015 AnyKey Entertainment. All rights reserved.
 
 if [ "$NDK" = "" ]; then
 	echo NDK variable not set, exiting
@@ -34,6 +35,9 @@ function build_x264
         --prefix=$(pwd)/$PREFIX \
         --host=$HOST-linux \
         --enable-static \
+        --enable-pic \
+        --disable-asm \
+        --disable-cli \
         $ADDITIONAL_CONFIGURE_FLAG \
         || exit 1
 
@@ -168,6 +172,8 @@ EOF
 	    --enable-decoder=mp2 \
 	    --enable-encoder=libvo_amrwbenc \
 	    --enable-decoder=amrwb \
+	    --enable-encoder=libx264 \
+	    --enable-decoder=libx264 \
 	    --enable-muxer=mp2 \
 	    --enable-bsfs \
 	    --enable-decoders \
@@ -179,6 +185,7 @@ EOF
 	    --enable-avcodec \
 	    --enable-avresample \
 	    --enable-zlib \
+        --enable-libx264 \
 	    --disable-doc \
 	    --disable-ffplay \
 	    --disable-ffmpeg \
@@ -191,6 +198,7 @@ EOF
 	    --enable-version3 \
 	    --enable-memalign-hack \
 	    --enable-asm \
+        --enable-gpl \
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 	make clean || exit 1
@@ -202,7 +210,7 @@ EOF
 function build_one {
 	pushd external/ffmpeg
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib  -soname $SONAME -shared -nostdlib -z noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lswscale -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.9/libgcc.a || exit 1
+	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib -soname $SONAME -shared -nostdlib -z noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lx264 -lswscale -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.9/libgcc.a || exit 1
 	popd
 #-lfreetype
 }
@@ -220,6 +228,7 @@ SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-14
 #build_freetype2
+build_x264
 build_ffmpeg
 build_one
 
